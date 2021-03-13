@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "my-rel-gen"
+name = "mrelm"
 version = "0.1.0"
 description = ""
 authors = ["Bryan Hu <bryan.hu.2020@gmail.com>"]
