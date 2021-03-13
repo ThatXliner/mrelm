@@ -25,9 +25,9 @@ def build_for(project_type: PythonProjectTypeEnum) -> List[str]:
         )
         poetry_binary = shutil.which("poetry")
         assert poetry_binary is not None
-        subprocess.run([poetry_binary, "build"], check=True)
+        subprocess.run([poetry_binary, "build"], check=True, stdout=subprocess.DEVNULL)
         zipapp.create_archive(
-            module_name,
+            Path().joinpath(module_name.replace("-", "_")),
             target=Path().joinpath("dist").joinpath(module_name + ".pyz"),
             interpreter=shutil.which("python3")
             or shutil.which("python")

@@ -44,7 +44,7 @@ def get_lst_commit_hash(branch: Optional[str] = None) -> str:
     command: List[str] = gitify(["log", "-1", "--pretty=%H"])
     if branch:
         command.append(branch)
-    return subprocess.check_output(command).decode()
+    return subprocess.check_output(command).decode().strip()
 
 
 def gitify(command_args: List[str], *, git_dir: Optional[str] = None) -> List[str]:

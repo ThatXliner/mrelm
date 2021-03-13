@@ -3,11 +3,10 @@
 """Utilities for keeping one sane"""
 
 import enum
-import json
 import os
 import os.path
 import shutil
-from typing import List, Sequence, Tuple
+from typing import Sequence
 
 import github
 import toml
