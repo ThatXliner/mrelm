@@ -93,7 +93,7 @@ def build_project(
     *, project_type: ProjectTypeEnum = ProjectTypeEnum.PYTHON
 ) -> Artifacts:
     if project_type == ProjectTypeEnum.PYTHON:
-        project_type = py_utils.get_project_type()
-        return Artifacts(py_utils.build_for(project_type))
+        py_project_type = py_utils.get_project_type()
+        return Artifacts(py_utils.build_for(py_project_type))
     else:
         raise NotImplementedError("Yeah, sorry: we haven't implemented that one yet")
