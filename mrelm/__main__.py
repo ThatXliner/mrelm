@@ -19,8 +19,12 @@ def main() -> None:
         f"\N{RIGHT-POINTING MAGNIFYING GLASS} Last commit: {lst_commit.hash_id} |",
         end=" ",
     )
-    if utils.is_version_bump(lst_commit.message):
-        print(" \N{WHITE HEAVY CHECK MARK} Version bump detected")
+    should_bootstrap = "--bootstrap" in sys.argv[1:]
+    if utils.is_version_bump(lst_commit.message) or should_bootstrap:
+        print(
+            " \N{WHITE HEAVY CHECK MARK} ",
+            ("Requested bootstrap" if should_bootstrap else "Version bump detected"),
+        )
         project_version = utils.get_project_version()
         print(f"\N{BOOKMARK} Project version detected: {project_version}")
         with halo.Halo("Building project...") as spinner:  # type: ignore
