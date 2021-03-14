@@ -5,7 +5,7 @@ My release maker
 
 What is this
 ------------
-This package is a simple script that will create a GitHub release.
+This package is a simple script that will create a GitHub release. Note that it requires bootstrapping.
 
 It features
 
