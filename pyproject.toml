@@ -1,8 +1,12 @@
 [tool.poetry]
 name = "mrelm"
 version = "0.1.0"
-description = ""
+license = "GPL-3.0-or-later"
+description = "My release maker"
 authors = ["Bryan Hu <bryan.hu.2020@gmail.com>"]
+
+[tool.poetry.scripts]
+mrelm = "mrelm.__main__:main"
 
 [tool.poetry.dependencies]
 python = "^3.6"
