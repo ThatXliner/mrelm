@@ -27,7 +27,7 @@ def create_tag(
     gith.get_repo(repo).create_git_tag(
         tag=tag_name,
         message=msg,
-        object=on if on.hash else get_lst_commit_hash(),
+        object=on.hash_id if on is not None else get_lst_commit_hash(),
         type="commit",
     )
     # command: List[str] = gitify(["tag", tag_name])

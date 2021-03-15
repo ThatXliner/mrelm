@@ -81,13 +81,11 @@ def create_release(
     title: str,
 ) -> None:
     gith = make_gith_obj()
-    release = gith.get_repo(repo).create_git_tag_and_release(
+    release = gith.get_repo(repo).create_git_release(
         tag=tag_name,
-        object=commit_hash,
-        release_name=title,
-        release_message=msg,
-        type="commit",
-        tag_message=tag_name,
+        target_commitish=commit_hash,
+        name=title,
+        message=msg,
     )
     for artifact in artifacts:
         if artifact.endswith(".whl"):

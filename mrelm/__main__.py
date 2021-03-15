@@ -55,29 +55,42 @@ def main() -> None:
         else:
             print("\N{WHITE HEAVY CHECK MARK} Version bump detected")
         project_version = utils.get_project_version()
-        print(f"\N{BOOKMARK} Project version detected: {project_version}")
-        with halo.Halo("Building project...") as spinner:  # type: ignore
+        print(f"\N{BOOKMARK} Project version detected:", Fore.YELLOW + project_version)
+        with halo.Halo("\N{HAMMER} Building project") as spinner:  # type: ignore
             try:
                 artifacts = utils.build_project()
             except Exception as exception:
-                spinner.fail()
+                spinner.fail(" Building project")
                 raise exception
-            spinner.succeed()
-        with halo.Halo("Creating and uploading release") as spinner:  # type: ignore
-            from_, to_ = git_utils.get_lst_tags(2)
-            utils.create_release(
-                msg=git_utils.generate_release_notes(from_, to_),
-                repo=repo,
-                tag_name=f"v{project_version}",
-                title=f"Version v{project_version}",
-                artifacts=artifacts.artifacts,
-                commit_hash=lst_commit.hash_id,
-            )
-            spinner.succeed()
+            spinner.succeed(" Building project")
+        with halo.Halo("\N{GLOBE WITH MERIDIANS} Creating and uploading release") as spinner:  # type: ignore
+            if should_bootstrap:
+                utils.create_release(
+                    repo=repo,
+                    msg=(
+                        "# \N{SPARKLES} Initial Release!\n"
+                        "We this is our first, ever release! \N{PARTY POPPER}\n"
+                    ),
+                    tag_name=f"v{project_version}",
+                    title=f"Version v{project_version}",
+                    artifacts=artifacts.artifacts,
+                    commit_hash=lst_commit.hash_id,
+                )
+            else:
+                last_tags = git_utils.get_lst_tags(2)
+                utils.create_release(
+                    msg=git_utils.generate_release_notes(last_tags[0], last_tags[1]),
+                    repo=repo,
+                    tag_name=f"v{project_version}",
+                    title=f"Version v{project_version}",
+                    artifacts=artifacts.artifacts,
+                    commit_hash=lst_commit.hash_id,
+                )
+            spinner.succeed(" Creating and uploading release")
         if should_release:
-            with halo.Halo("Publishing to PyPi") as spinner:  # type: ignore
+            with halo.Halo("\N{OUTBOX TRAY} Publishing to PyPi") as spinner:  # type: ignore
                 py_utils.publish_for(py_utils.get_project_type())
-                spinner.succeed()
+                spinner.succeed(" Publishing to PyPi")
         artifacts.delete()
     elif should_generate_release_notes:
         from_, to_ = git_utils.get_lst_tags(2)
