@@ -6,8 +6,12 @@ import enum
 import os
 import os.path
 import shutil
-from typing import Sequence
+import sys
+from typing import NoReturn, Sequence
 
+from colorama import Fore, Style, init
+
+init(autoreset=True)
 import github
 import toml
 
@@ -63,6 +67,11 @@ def get_commit_type(commit_msg: str) -> str:
     return "MISC"
 
 
+def errorize(msg: str, returncode: int = 1) -> NoReturn:
+    print(Style.BRIGHT + Fore.RED + msg)
+    sys.exit(returncode)
+
+
 def create_release(
     msg: str,
     repo: str,
@@ -95,5 +104,4 @@ def build_project(
     if project_type == ProjectTypeEnum.PYTHON:
         py_project_type = py_utils.get_project_type()
         return Artifacts(py_utils.build_for(py_project_type))
-    else:
-        raise NotImplementedError("Yeah, sorry: we haven't implemented that one yet")
+    raise NotImplementedError("Yeah, sorry: we haven't implemented that one yet")
