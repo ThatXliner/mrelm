@@ -5,7 +5,7 @@ import argparse
 import os
 
 import halo
-from colorama import Fore, Style, init
+from colorama import Fore, init
 
 init(autoreset=True)
 from typing import Optional
@@ -46,7 +46,7 @@ def main() -> None:
             " add the `--repo=Username/repo_name` argument"
         )
     print(
-        f"\N{RIGHT-POINTING MAGNIFYING GLASS} Last commit:",
+        "\N{RIGHT-POINTING MAGNIFYING GLASS} Last commit:",
         Fore.YELLOW + str(lst_commit.hash_id),
     )
     if utils.is_version_bump(lst_commit.message) or should_bootstrap:
