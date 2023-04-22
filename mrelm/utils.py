@@ -12,18 +12,10 @@ from typing import NoReturn, Sequence
 from colorama import Fore, Style, init
 
 init(autoreset=True)
-import github
+
 import toml
 
 from . import py_utils
-
-
-def make_gith_obj() -> github.Github:
-    token = os.getenv("GITHUB_TOKEN")
-    if token is None:
-        raise ValueError("You must set the `GITHUB_TOKEN` enviorment variable")
-    assert token is not None
-    return github.Github(token)
 
 
 class CommitTypeEnum(enum.Enum):
@@ -38,9 +30,9 @@ class ProjectTypeEnum(enum.Enum):
 
 
 class Artifacts:
-    def __init__(self, artfacts: Sequence[str]) -> None:
-        self.dir = os.path.commonpath(artfacts)
-        self.artifacts = artfacts
+    def __init__(self, artifacts: Sequence[str]) -> None:
+        self.dir = os.path.commonpath(artifacts)
+        self.artifacts = artifacts
         self.glob: str = self.dir + "/*"
 
     def delete(self) -> None:
@@ -70,30 +62,6 @@ def get_commit_type(commit_msg: str) -> str:
 def errorize(msg: str, returncode: int = 1) -> NoReturn:
     print(Style.BRIGHT + Fore.RED + msg)
     sys.exit(returncode)
-
-
-def create_release(
-    msg: str,
-    repo: str,
-    tag_name: str,
-    commit_hash: str,
-    artifacts: Sequence[str],
-    title: str,
-) -> None:
-    gith = make_gith_obj()
-    release = gith.get_repo(repo).create_git_release(
-        tag=tag_name,
-        target_commitish=commit_hash,
-        name=title,
-        message=msg,
-    )
-    for artifact in artifacts:
-        if artifact.endswith(".whl"):
-            release.upload_asset(artifact, label="Wheel Binary")
-        elif artifact.endswith("pyz"):
-            release.upload_asset(artifact, label="ZipApp")
-        elif artifact.endswith(".tar.gz"):
-            release.upload_asset(artifact, label="Source Distribution")
 
 
 def build_project(

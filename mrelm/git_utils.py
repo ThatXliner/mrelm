@@ -20,27 +20,43 @@ if GIT is None:
     raise RuntimeError("Git is not installed on this system.")
 
 
-def create_tag(
-    repo: str, tag_name: str, on: Optional[Commit] = None, msg: str = ""
-) -> None:
-    gith = utils.make_gith_obj()
-    gith.get_repo(repo).create_git_tag(
-        tag=tag_name,
-        message=msg,
-        object=on.hash_id if on is not None else get_lst_commit_hash(),
-        type="commit",
-    )
-    # command: List[str] = gitify(["tag", tag_name])
-    # if on is not None:
-    #     command.append(on.hash_id)
-    # subprocess.run(command, check=True)
+# def create_tag(
+#     repo: str, tag_name: str, on: Optional[Commit] = None, msg: str = ""
+# ) -> None:
+#     gith = utils.make_gith_obj()
+#     gith.get_repo(repo).create_git_tag(
+#         tag=tag_name,
+#         message=msg,
+#         object=on.hash_id if on is not None else get_last_commit_hash(),
+#         type="commit",
+#     )
+# command: List[str] = gitify(["tag", tag_name])
+# if on is not None:
+#     command.append(on.hash_id)
+# subprocess.run(command, check=True)
 
 
-def get_lst_commit() -> Commit:
-    return Commit(message=get_lst_commit_msg(), hash_id=get_lst_commit_hash())
+def get_first_commit() -> Commit:
+    first_hash = get_first_commit_hash()
+    return Commit(message=get_message_for_hash(first_hash), hash_id=first_hash)
 
 
-def get_lst_commit_hash(branch: Optional[str] = None) -> str:
+def get_message_for_hash(hash_id: str) -> str:
+    command: List[str] = gitify(["log", "-1", "--pretty=format:%B"])
+    command.append(hash_id)
+    return subprocess.check_output(command).decode().strip()
+
+
+def get_first_commit_hash() -> str:
+    command: List[str] = gitify(["rev-list", "--max-parents=0", "HEAD"])
+    return subprocess.check_output(command).decode().strip()
+
+
+def get_last_commit() -> Commit:
+    return Commit(message=get_last_commit_msg(), hash_id=get_last_commit_hash())
+
+
+def get_last_commit_hash(branch: Optional[str] = None) -> str:
     command: List[str] = gitify(["log", "-1", "--pretty=%H"])
     if branch:
         command.append(branch)
@@ -57,7 +73,9 @@ def gitify(command_args: List[str], *, git_dir: Optional[str] = None) -> List[st
     return commands
 
 
-def generate_release_notes(from_: str, to: str, *, add_watermark: bool = True) -> str:
+def generate_release_notes(
+    from_: str, to: str, version: Optional[str] = None, add_watermark: bool = True
+) -> str:
     def make_section(section_name: str, commits: List[List[str]]) -> str:
         output = f"## {section_name}\n"
         for item in commits:
@@ -68,14 +86,18 @@ def generate_release_notes(from_: str, to: str, *, add_watermark: bool = True) -
         return f" - {commit_msg} (`{commit_hash}`)\n"
 
     commits = (
-        subprocess.check_output(gitify(["log", f"{from_}..{to}", "--pretty='%h|%s'"]))
+        subprocess.check_output(gitify(["log", f"{from_}..{to}", "--pretty=%h|%s"]))
         .decode()
         .splitlines()
     )
     release_notes: DefaultDict[str, List[List[str]]] = defaultdict(list)
     for commit in commits:
         release_notes[utils.get_commit_type(commit)].append(commit.split("|", 1))
-    output = "# Changelog\n"
+    if version == "<initial>":
+        output = "# Initial Release \N{PARTY POPPER}!\nThis is the first release!"
+        return output
+    else:
+        output = f"# Changelog" + (f" ({version})\n" if version else "\n")
     if release_notes.get("BREAKING") is not None:
         output += make_section(
             "\N{COLLISION SYMBOL} BREAKING CHANGES!", release_notes["BREAKING"]
@@ -93,16 +115,16 @@ def generate_release_notes(from_: str, to: str, *, add_watermark: bool = True) -
         output
         + "\n"
         + (
-            "--\n<small>Made with "
+            "---\n<small>Made with "
             '<a href="https://github.com/ThatXliner">@ThatXliner</a>\'s'
-            " mrelg</small>"
+            " mrelm</small>"
             if add_watermark
             else ""
         )
     )
 
 
-def get_lst_commit_msg(branch: Optional[str] = None) -> str:
+def get_last_commit_msg(branch: Optional[str] = None) -> str:
     """Get the last commit's message"""
     command: List[str] = gitify(["log", "-1", "--pretty=%s"])
     if branch:

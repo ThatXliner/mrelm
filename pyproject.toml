@@ -11,7 +11,6 @@ mrelm = "mrelm.__main__:main"
 [tool.poetry.dependencies]
 python = "^3.6"
 toml = "^0.10.2"
-PyGithub = "^1.54.1"
 halo = "^0.0.31"
 colorama = "^0.4.4"
 
